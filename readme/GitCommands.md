@@ -1,0 +1,1 @@
+1. `git reset HEAD -- .` unstage all documents (run command in root directory)
