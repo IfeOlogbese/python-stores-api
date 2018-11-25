@@ -7,6 +7,12 @@ class UserModel:
 		self.username = username
 		self.password = password
 
+	def json(self):
+		return {
+			'id': self.id,
+			'username': self.username
+		}
+
 	@classmethod
 	def find_by_username(cls, username):
 		row = Database.find_one('users', {'username': username})
@@ -18,6 +24,9 @@ class UserModel:
 			user = None
 
 		return user
+
+	def delete_from_db(self):
+		Database.remove('users', {'_id': ObjectId(self.id)})
 
 	@classmethod
 	def find_by_id(cls, _id):

@@ -20,6 +20,9 @@
 4. Install Flask-JWT
     - `pip install Flask-JWT`
 
+4. Install Flask-JWT Extended
+    - `pip install flask-jwt-extended`
+
 5. Install PyLint
     - `pip install -U pylint`
 
