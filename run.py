@@ -1,3 +1,6 @@
 from app import app
+from db.database import Database
 
-app.run(port=5000, debug=True)
+@app.before_first_request # initialize database connection
+def init_db():
+    Database.initialize()
