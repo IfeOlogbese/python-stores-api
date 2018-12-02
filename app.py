@@ -4,9 +4,13 @@ from flask_jwt_extended import JWTManager  # import JWT
 from resources.user import UserRegister, User, UserLogin, TokenRefresh
 from resources.item import Item, ItemList
 from resources.store import Store, StoreList
+from blacklist import BLACKLIST
 
 app = Flask(__name__)
 app.config['PROPAGATE_EXCEPTIONS'] = True  # for proper Flask JWT errors
+app.config['JWT_BLACKLIST_ENABLED'] = True  # enable JWT blacklisting
+app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = [
+    'access', 'refresh']  # where to activate blacklisting
 app.secret_key = "some secret key"  # app.config['JWT_SECRET_KEY]
 api = Api(app)  # Allow us to very easily add http resources
 
@@ -17,11 +21,19 @@ jwt = JWTManager(app)
 
 @jwt.user_claims_loader
 def add_claims_to_jwt(identity):
-    if identity: #do something here instead of hardcoding this
+    if identity:  # do something here instead of hardcoding this
         return {'is_admin': True}
     return {'is_admin': False}
 
+# Check if user is blacklisted and revert user login
+
+@jwt.token_in_blacklist_loader
+def check_if_token_in_blacklist(decrypted_token):
+    return decrypted_token['identity'] in BLACKLIST
+
 # call backs
+
+
 @jwt.expired_token_loader
 def expired_token_callback():
     return jsonify({
@@ -30,6 +42,8 @@ def expired_token_callback():
     }), 401
 
 # When token that was sent isn't valid
+
+
 @jwt.invalid_token_loader
 def invalid_token_callback(error):
     return jsonify({
@@ -38,6 +52,8 @@ def invalid_token_callback(error):
     }), 401
 
 # When no token was sent at all
+
+
 @jwt.unauthorized_loader
 def missing_token_callback(error):
     return jsonify({
@@ -46,6 +62,8 @@ def missing_token_callback(error):
     }), 401
 
 # When no fresh token was sent
+
+
 @jwt.needs_fresh_token_loader
 def token_not_fresh_callback():
     return jsonify({
@@ -54,12 +72,15 @@ def token_not_fresh_callback():
     }), 401
 
 # When no fresh token was sent
+
+
 @jwt.revoked_token_loader
 def revoked_token_callback():
     return jsonify({
         'description': 'The token has been revoked.',
         'error': 'token_revoked'
     }), 401
+
 
 api.add_resource(Item, '/item/<string:name>')  # http://localhost:5000/item/ife
 api.add_resource(ItemList, '/items')
