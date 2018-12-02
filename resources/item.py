@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_restful import Resource, reqparse
-from flask_jwt_extended import (jwt_required, jwt_optional, get_jwt_claims, get_jwt_identity, fresh_jwt_required)
+from flask_jwt_extended import (
+    jwt_required, jwt_optional, get_jwt_claims, get_jwt_identity, fresh_jwt_required)
 from db.database import Database
 from models.item import ItemModel
 
